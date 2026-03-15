@@ -33,7 +33,7 @@ class PrimaryButton extends StatelessWidget {
     this.backgroundColor = AppColors.primary,
     this.textColor = AppColors.white,
     this.borderRadius = 100,
-    this.isGradient = true,
+    this.isGradient = false,
   });
 
   String get _uniqueTag => tag ?? text;
