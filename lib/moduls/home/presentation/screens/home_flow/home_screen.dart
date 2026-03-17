@@ -9,8 +9,6 @@ import 'package:cembostyle/core/common/widgets/app_ui/recent_activity_tile.dart'
 import 'package:cembostyle/core/common/widgets/app_ui/section_title.dart';
 import 'package:cembostyle/core/common/widgets/app_ui/upload_card.dart';
 import 'package:cembostyle/moduls/home/presentation/widgets/home_flow/home_hero_card.dart';
-import 'package:cembostyle/moduls/home/presentation/widgets/home_flow/upgrade_plan_dialog.dart';
-
 import '../../../../stencil/presentation/routes/stencil_routes.dart';
 
 class HomeScreen extends StatelessWidget {
