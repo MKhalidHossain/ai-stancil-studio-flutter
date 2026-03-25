@@ -1,6 +1,6 @@
 import 'setup_core.dart';
 import 'setup_repository.dart';
-// import 'setup_usecases.dart';
+import 'setup_usecases.dart';
 import 'setup_controllers.dart';
 import 'setup_services.dart';
 
@@ -13,7 +13,7 @@ void setupServiceLocator() {
   setupRepository();
 
   // Use Cases
-  // setupUsecases();
+  setupUsecases();
 
   // Controllers
   setupControllers();

@@ -113,15 +113,22 @@ class ApiClient {
       );
 
       if (baseResponse.success && baseResponse.data != null) {
-        final newAccessToken = baseResponse.data!['accessToken'] as String;
-        final newRefreshToken = baseResponse.data!['refreshToken'] as String;
+        final data = baseResponse.data!;
+        final newAccessToken = data['accessToken'] as String?;
+        final newRefreshToken = data['refreshToken'] as String?;
 
-        await _authStorageService.storeAccessToken(accessToken: newAccessToken);
-        await _authStorageService.storeRefreshToken(
-          refreshToken: newRefreshToken,
-        );
+        if (newAccessToken != null && newAccessToken.isNotEmpty) {
+          await _authStorageService.storeAccessToken(
+            accessToken: newAccessToken,
+          );
+        }
+        if (newRefreshToken != null && newRefreshToken.isNotEmpty) {
+          await _authStorageService.storeRefreshToken(
+            refreshToken: newRefreshToken,
+          );
+        }
 
-        return true;
+        return newAccessToken != null && newAccessToken.isNotEmpty;
       }
 
       // Navigate to login screen - you'll need to implement this based on your navigation

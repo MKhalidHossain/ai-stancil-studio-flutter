@@ -1,12 +1,10 @@
 class ApiConstants {
   /// [Base Configuration]
 
-
-  static const String baseDomain = 'http://72.61.161.196:5004'; // Production
+  static const String baseDomain = 'http://localhost:5000';
   // static const String baseDomain = 'http://10.10.5.90:5000'; // Farhan Office
 
- // static const String baseDomain = 'http://10.10.5.33:5003'; // Eshita Office
-
+  // static const String baseDomain = 'http://10.10.5.33:5003'; // Eshita Office
 
   static const String baseUrl = '$baseDomain/api/v1';
 
@@ -51,21 +49,24 @@ class ApiConstants {
   static NotificationEndpoints get notification => NotificationEndpoints();
   static MedicinePlanEndpoints get medicinePlan => MedicinePlanEndpoints();
   static ProfileEndpoints get profile => ProfileEndpoints();
+  static GalleryEndpoints get gallery => GalleryEndpoints();
+  static StencilEndpoints get stencil => StencilEndpoints();
 }
 
 /// [Authentication Endpoints]
 class AuthEndpoints {
   static const String _base = '${ApiConstants.baseUrl}/auth';
-  final String refreshToken = '$_base/refresh';
+  final String refreshToken = '$_base/refresh-token';
 
   final String login = '$_base/login';
   final String signup = '$_base/register';
-  final String forgotPassword = '$_base/forgotPassword';
-  final String verifyOtp = '$_base/verify-email';
-  final String resetPassword = '$_base/resetPassword';
+  final String logout = '$_base/logout';
+  final String forgotPassword = '$_base/forgot-password';
+  final String verifyOtp = '$_base/verify-otp';
+  final String resetPassword = '$_base/reset-password';
 
   final String google = '$_base/google';
-  final String changePassword = '$_base/updateMyPassword';
+  final String changePassword = '$_base/change-password';
 }
 
 class SearchEndpoints {
@@ -84,7 +85,6 @@ class UserEndpoints {
   static const String _base = '${ApiConstants.baseUrl}/users';
   final String updateProfile = '$_base/profile';
   final String uploadWork = '$_base/works';
-
 }
 
 class MedicinePlanEndpoints {
@@ -167,11 +167,24 @@ class ProfileEndpoints {
   final String changePass = '${ApiConstants.baseUrl}/auth/change-password';
   final String toggleLikes = '${ApiConstants.baseUrl}/social/like';
 
-   String fetchPublicCreativeProfile(String userId) =>
+  String fetchPublicCreativeProfile(String userId) =>
       '${ApiConstants.baseUrl}/users/creative/$userId';
-         String unblockUser(String userId) =>
+  String unblockUser(String userId) =>
       '${ApiConstants.baseUrl}/social/block/$userId';
 
   final String fetchDislikes = '${ApiConstants.baseUrl}/social/my-dislikes';
   final String toggleDislikes = '${ApiConstants.baseUrl}/social/dislike';
+}
+
+class GalleryEndpoints {
+  static const String _base = '${ApiConstants.baseUrl}/pregallery';
+
+  String byCategory(String category) =>
+      '$_base/${Uri.encodeComponent(category)}';
+}
+
+class StencilEndpoints {
+  static const String _base = '${ApiConstants.baseUrl}/aistencil';
+
+  final String getMyAllStencils = _base;
 }

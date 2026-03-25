@@ -55,11 +55,8 @@ class AuthStorageService {
   // Check user authenticater or not
   Future<bool> isAuthenticated() async {
     final accessToken = await getAccessToken();
-    final roleString = await _secureStorage.read(key: KeyConstants.role);
     return accessToken != null &&
-        accessToken.isNotEmpty &&
-        roleString != null &&
-        roleString.isNotEmpty;
+        accessToken.isNotEmpty;
   }
 
   // Get access token
@@ -117,6 +114,7 @@ class AuthStorageService {
       _secureStorage.delete(key: KeyConstants.userId),
       _secureStorage.delete(key: KeyConstants.role),
     ]);
+
   }
 
   // Check if user ID exists

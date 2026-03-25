@@ -1,8 +1,23 @@
-
 import 'package:get/get.dart';
 
-import '../utils/getx_helper.dart';
+import '../../moduls/auth/presentation/controllers/auth_controller.dart';
+import '../../moduls/home/controllers/home_controller.dart';
+import '../../moduls/stencil/controllers/stencil_controller.dart';
 
 void setupControllers() {
-  // Get.getOrPutLazy(() => AuthController());
+  Get.put(
+    AuthController(
+      loginUseCase: Get.find(),
+      signupUseCase: Get.find(),
+      forgotPasswordUseCase: Get.find(),
+      verifyOtpUseCase: Get.find(),
+      resetPasswordUseCase: Get.find(),
+      refreshTokenUseCase: Get.find(),
+      changePasswordUseCase: Get.find(),
+      logoutUseCase: Get.find(),
+    ),
+  );
+
+  Get.put(HomeController());
+  Get.put(StencilController());
 }
