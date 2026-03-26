@@ -34,7 +34,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
     final accessToken = await _authStorageService.getAccessToken();
     if (accessToken == null || accessToken.isEmpty) {
-      _goToLogin();
+      _goToWelcome();
       return;
     }
 
@@ -48,7 +48,7 @@ class _SplashScreenState extends State<SplashScreen> {
     if (refreshToken == null || refreshToken.isEmpty) {
       await _authStorageService.clearAuthData();
       if (!mounted) return;
-      _goToLogin();
+      _goToWelcome();
       return;
     }
 
@@ -64,7 +64,7 @@ class _SplashScreenState extends State<SplashScreen> {
     } else {
       await _authStorageService.clearAuthData();
       if (!mounted) return;
-      _goToLogin();
+      _goToWelcome();
     }
   }
 
@@ -72,8 +72,8 @@ class _SplashScreenState extends State<SplashScreen> {
     Get.offAllNamed(HomeRoutes.home);
   }
 
-  void _goToLogin() {
-    Get.offAllNamed(AuthRoutes.login);
+  void _goToWelcome() {
+    Get.offAllNamed(AuthRoutes.welcome);
   }
 
   @override

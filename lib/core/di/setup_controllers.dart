@@ -5,7 +5,7 @@ import '../../moduls/home/controllers/home_controller.dart';
 import '../../moduls/stencil/controllers/stencil_controller.dart';
 
 void setupControllers() {
-  Get.put(
+  Get.put<AuthController>(
     AuthController(
       loginUseCase: Get.find(),
       signupUseCase: Get.find(),
@@ -18,6 +18,6 @@ void setupControllers() {
     ),
   );
 
-  Get.put(HomeController());
-  Get.put(StencilController());
+  Get.put<HomeController>(HomeController());
+  Get.put<StencilController>(StencilController());
 }

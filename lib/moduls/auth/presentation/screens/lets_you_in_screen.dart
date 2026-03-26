@@ -22,11 +22,20 @@ class LetsYouInScreen extends StatelessWidget {
             Image.asset(AppImages.appLogo, width: 150, height: 130),
             const SizedBox(height: 18),
             Text(
-              'Welcome to Bread Stencil app',
+              'Welcome to Cembostyle',
               style: GoogleFonts.poppins(
                 fontSize: 15,
                 fontWeight: FontWeight.w500,
                 color: AuthColors.textPrimary,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Create an account or sign in to generate tattoo stencils from your own images.',
+              style: GoogleFonts.poppins(
+                fontSize: 12,
+                color: AuthColors.textSecondary,
               ),
               textAlign: TextAlign.center,
             ),

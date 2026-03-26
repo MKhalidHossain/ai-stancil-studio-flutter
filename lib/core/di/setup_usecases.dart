@@ -10,12 +10,12 @@ import '../../moduls/auth/domain/usecases/signup_usecase.dart';
 import '../../moduls/auth/domain/usecases/verify_otp_usecase.dart';
 
 void setupUsecases() {
-  Get.lazyPut(() => LoginUseCase(Get.find()));
-  Get.lazyPut(() => SignupUseCase(Get.find()));
-  Get.lazyPut(() => ForgotPasswordUseCase(Get.find()));
-  Get.lazyPut(() => VerifyOtpUseCase(Get.find()));
-  Get.lazyPut(() => ResetPasswordUseCase(Get.find()));
-  Get.lazyPut(() => RefreshTokenUseCase(Get.find()));
-  Get.lazyPut(() => ChangePasswordUseCase(Get.find()));
-  Get.lazyPut(() => LogoutUseCase(Get.find()));
+  Get.put(LoginUseCase(Get.find()));
+  Get.put(SignupUseCase(Get.find()));
+  Get.put(ForgotPasswordUseCase(Get.find()));
+  Get.put(VerifyOtpUseCase(Get.find()));
+  Get.put(ResetPasswordUseCase(Get.find()));
+  Get.put(RefreshTokenUseCase(Get.find()));
+  Get.put(ChangePasswordUseCase(Get.find()));
+  Get.put(LogoutUseCase(Get.find()));
 }

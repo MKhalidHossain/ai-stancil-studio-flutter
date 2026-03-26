@@ -48,8 +48,8 @@ class HomeHeroCard extends StatelessWidget {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    Colors.black.withOpacity(0.68),
-                    Colors.black.withOpacity(0.35),
+                    Colors.black.withValues(alpha: 0.68),
+                    Colors.black.withValues(alpha: 0.35),
                   ],
                   begin: Alignment.bottomLeft,
                   end: Alignment.topRight,

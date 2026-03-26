@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:cembostyle/moduls/auth/presentation/controllers/auth_controller.dart';
+import 'package:cembostyle/moduls/home/presentation/routes/home_routes.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -143,7 +144,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           password: _passwordController.text.trim(),
                         );
                         if (success) {
-                          Get.offNamed(AuthRoutes.login);
+                          Get.offAllNamed(HomeRoutes.home);
                         }
                       }
                     : null,

@@ -19,6 +19,10 @@ import 'package:cembostyle/moduls/home/presentation/screens/home_flow/my_stencil
 import 'package:cembostyle/moduls/home/presentation/screens/home_flow/payment_method_screen.dart';
 import 'package:cembostyle/moduls/home/presentation/screens/home_flow/pricing_plan_screen.dart';
 import 'package:cembostyle/moduls/home/presentation/screens/home_shell_screen.dart';
+import 'package:cembostyle/moduls/home/presentation/screens/profile_flow/my_profile_screen.dart';
+import 'package:cembostyle/moduls/home/presentation/screens/profile_flow/password_security_screen.dart';
+import 'package:cembostyle/moduls/home/presentation/screens/profile_flow/privacy_legal_screen.dart';
+import 'package:cembostyle/moduls/home/presentation/screens/profile_flow/terms_services_screen.dart';
 import 'package:cembostyle/moduls/stencil/presentation/routes/stencil_routes.dart';
 import 'package:cembostyle/moduls/stencil/presentation/screens/customize_style_screen.dart';
 import 'package:cembostyle/moduls/stencil/presentation/screens/stencil_result_screen.dart';
@@ -74,6 +78,22 @@ class MyApp extends StatelessWidget {
         GetPage(
           name: HomeRoutes.payment,
           page: () => const PaymentMethodScreen(),
+        ),
+        GetPage(
+          name: HomeRoutes.myProfile,
+          page: () => const MyProfileScreen(),
+        ),
+        GetPage(
+          name: HomeRoutes.passwordSecurity,
+          page: () => const PasswordSecurityScreen(),
+        ),
+        GetPage(
+          name: HomeRoutes.privacyLegal,
+          page: () => const PrivacyLegalScreen(),
+        ),
+        GetPage(
+          name: HomeRoutes.termsServices,
+          page: () => const TermsServicesScreen(),
         ),
         GetPage(
           name: StencilRoutes.customizeStyle,

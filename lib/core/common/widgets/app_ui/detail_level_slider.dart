@@ -34,14 +34,12 @@ class DetailLevelSlider extends StatelessWidget {
 
             return GestureDetector(
               onTapDown: (details) {
-                final dx =
-                    details.localPosition.dx.clamp(0.0, width) as double;
+                final dx = details.localPosition.dx.clamp(0.0, width);
                 final nearest = _nearestIndex(dx, positions);
                 onChanged(nearest);
               },
               onHorizontalDragUpdate: (details) {
-                final dx =
-                    details.localPosition.dx.clamp(0.0, width) as double;
+                final dx = details.localPosition.dx.clamp(0.0, width);
                 final nearest = _nearestIndex(dx, positions);
                 onChanged(nearest);
               },

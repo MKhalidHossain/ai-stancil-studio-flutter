@@ -8,11 +8,11 @@ import '../network/api_client.dart';
 import '../network/services/auth_storage_service.dart';
 
 void setupRepository() {
-  Get.lazyPut<AuthRemoteDataSource>(
-    () => AuthRemoteDataSource(apiClient: Get.find<ApiClient>()),
+  Get.put<AuthRemoteDataSource>(
+    AuthRemoteDataSource(apiClient: Get.find<ApiClient>()),
   );
-  Get.lazyPut<AuthRepository>(
-    () => AuthRepositoryImpl(
+  Get.put<AuthRepository>(
+    AuthRepositoryImpl(
       remoteDataSource: Get.find<AuthRemoteDataSource>(),
       authStorageService: Get.find<AuthStorageService>(),
     ),

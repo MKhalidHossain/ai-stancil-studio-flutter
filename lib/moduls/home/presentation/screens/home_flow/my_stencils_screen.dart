@@ -6,6 +6,7 @@ import 'package:cembostyle/core/common/widgets/app_scaffold.dart';
 import 'package:cembostyle/core/theme/app_palette.dart';
 import 'package:cembostyle/moduls/stencil/controllers/stencil_controller.dart';
 import 'package:cembostyle/moduls/stencil/models/stencil_models.dart';
+import 'package:cembostyle/moduls/stencil/presentation/routes/stencil_routes.dart';
 
 class MyStencilsScreen extends StatefulWidget {
   const MyStencilsScreen({super.key});
@@ -27,6 +28,7 @@ class _MyStencilsScreenState extends State<MyStencilsScreen> {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<StencilController>();
+    controller.ensureLoaded();
 
     return AppScaffold(
       removePadding: true,
@@ -124,7 +126,29 @@ class _MyStencilsScreenState extends State<MyStencilsScreen> {
                   ),
                   itemBuilder: (context, index) {
                     final item = items[index];
-                    return _StencilGridCard(item: item);
+                    return _StencilGridCard(
+                      item: item,
+                      onTap: () {
+                        controller.applyStencilRecord(
+                          StencilRecord(
+                            id: item.id,
+                            style: item.styleName,
+                            colorTheme: item.colorTheme,
+                            detailLevel: item.detailLevel,
+                            brightness: 0.8,
+                            contrast: 0.6,
+                            status: item.status,
+                            createdAt: item.date,
+                            updatedAt: item.date,
+                            originalImageUrl: item.originalImageUrl,
+                            stencilImageUrl: item.stencilImageUrl,
+                            errorCode: '',
+                            errorMessage: item.errorMessage,
+                          ),
+                        );
+                        Get.toNamed(StencilRoutes.stencilResult);
+                      },
+                    );
                   },
                 );
               }),
@@ -195,97 +219,81 @@ class _SearchField extends StatelessWidget {
 
 class _StencilGridCard extends StatelessWidget {
   final StencilActivityItem item;
+  final VoidCallback onTap;
 
-  const _StencilGridCard({required this.item});
+  const _StencilGridCard({required this.item, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
     final styleLabel = item.style.split(' • ').first;
-    return Container(
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppPalette.cardBorder, width: 1),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x0F000000),
-            blurRadius: 10,
-            offset: Offset(0, 6),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: AspectRatio(
-              aspectRatio: 1,
-              child: Row(
-                children: [
-                  Expanded(
-                    child: AppCachedImage(
-                      imageUrl: item.thumbnailUrl,
-                      fit: BoxFit.cover,
-                      onTap: () {},
-                    ),
-                  ),
-                  Expanded(
-                    child: ColorFiltered(
-                      colorFilter: const ColorFilter.matrix([
-                        0.2126,
-                        0.7152,
-                        0.0722,
-                        0,
-                        0,
-                        0.2126,
-                        0.7152,
-                        0.0722,
-                        0,
-                        0,
-                        0.2126,
-                        0.7152,
-                        0.0722,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        1,
-                        0,
-                      ]),
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppPalette.cardBorder, width: 1),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x0F000000),
+              blurRadius: 10,
+              offset: Offset(0, 6),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: AspectRatio(
+                aspectRatio: 1,
+                child: Row(
+                  children: [
+                    Expanded(
                       child: AppCachedImage(
-                        imageUrl: item.thumbnailUrl,
+                        imageUrl: item.originalImageUrl.isNotEmpty
+                            ? item.originalImageUrl
+                            : item.thumbnailUrl,
                         fit: BoxFit.cover,
                         onTap: () {},
                       ),
                     ),
-                  ),
-                ],
+                    Expanded(
+                      child: AppCachedImage(
+                        imageUrl: item.stencilImageUrl.isNotEmpty
+                            ? item.stencilImageUrl
+                            : item.thumbnailUrl,
+                        fit: BoxFit.cover,
+                        onTap: () {},
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-          const SizedBox(height: 10),
-          Text(
-            styleLabel,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              color: AppPalette.textPrimary,
+            const SizedBox(height: 10),
+            Text(
+              styleLabel,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: AppPalette.textPrimary,
+              ),
             ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            item.date,
-            style: const TextStyle(
-              fontSize: 10,
-              color: AppPalette.textSecondary,
+            const SizedBox(height: 4),
+            Text(
+              item.date,
+              style: const TextStyle(
+                fontSize: 10,
+                color: AppPalette.textSecondary,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
