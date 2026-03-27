@@ -30,6 +30,7 @@ class StencilActivityItem {
   final String errorMessage;
   final String colorTheme;
   final int detailLevel;
+  final bool isSaved;
 
   const StencilActivityItem({
     required this.id,
@@ -44,6 +45,7 @@ class StencilActivityItem {
     this.errorMessage = '',
     this.colorTheme = '',
     this.detailLevel = 1,
+    this.isSaved = false,
   });
 }
 
@@ -73,6 +75,7 @@ class StencilRecord {
   final String stencilImageUrl;
   final String errorCode;
   final String errorMessage;
+  final bool isSaved;
 
   const StencilRecord({
     required this.id,
@@ -88,6 +91,7 @@ class StencilRecord {
     required this.stencilImageUrl,
     required this.errorCode,
     required this.errorMessage,
+    required this.isSaved,
   });
 
   factory StencilRecord.fromApi(Map<String, dynamic> json) {
@@ -115,6 +119,7 @@ class StencilRecord {
       stencilImageUrl: stencilUrl,
       errorCode: json['errorCode'] as String? ?? '',
       errorMessage: json['errorMessage'] as String? ?? '',
+      isSaved: json['isSaved'] == true,
     );
   }
 }

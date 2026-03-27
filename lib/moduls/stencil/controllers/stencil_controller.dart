@@ -1,9 +1,13 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:dio/dio.dart' as dio;
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -27,6 +31,8 @@ class StencilController extends GetxController {
   final RxDouble contrast = 0.6.obs;
   final RxBool isRecentActivityLoading = false.obs;
   final RxBool isGenerating = false.obs;
+  final RxBool isSavingToGallery = false.obs;
+  final RxBool isDownloadingPdf = false.obs;
   final RxString recentActivityError = ''.obs;
   final RxString generationError = ''.obs;
 
@@ -123,9 +129,10 @@ class StencilController extends GetxController {
   }
 
   Future<bool> generateStencil() async {
-    final file = selectedImageFile.value;
-    if (file == null) {
-      generationError.value = 'Select an image from gallery or camera first.';
+    final sourceFile = await _createSourceFile();
+    if (sourceFile == null) {
+      generationError.value =
+          'Select an image first or open a stencil with an original image to regenerate.';
       Get.snackbar('Stencil', generationError.value);
       return false;
     }
@@ -134,10 +141,7 @@ class StencilController extends GetxController {
     isGenerating.value = true;
 
     final formData = dio.FormData.fromMap({
-      'file': await dio.MultipartFile.fromFile(
-        file.path,
-        filename: file.path.split('/').last,
-      ),
+      'file': sourceFile,
       'style': selectedStyle.title,
       'colorTheme': selectedColorTheme.title,
       'detailLevel': selectedDetailLevel.value,
@@ -162,6 +166,7 @@ class StencilController extends GetxController {
       (success) async {
         final record = success.data;
         activeStencil.value = record;
+        compareValue.value = 0.55;
         _syncSelectedOptions(record);
         await fetchRecentActivities();
         return true;
@@ -202,18 +207,213 @@ class StencilController extends GetxController {
     }
   }
 
-  void markAsSaved() {
+  Future<void> markAsSaved() async {
     final record = activeStencil.value;
     if (record == null) {
       Get.snackbar('Save', 'Generate a stencil before saving it.');
       return;
     }
 
-    Get.snackbar(
-      'Saved',
-      'This stencil is already stored in your library.',
-      snackPosition: SnackPosition.BOTTOM,
+    if (record.isSaved) {
+      Get.snackbar(
+        'Saved to My Stencils',
+        'This stencil is already saved in My Stencils.',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
+
+    if (isSavingToGallery.value) {
+      return;
+    }
+
+    isSavingToGallery.value = true;
+
+    final result = await _apiClient.patch<StencilRecord>(
+      endpoint: ApiConstants.stencil.byId(record.id),
+      data: {'isSaved': true},
+      fromJsonT: (json) => StencilRecord.fromApi(json as Map<String, dynamic>),
     );
+
+    isSavingToGallery.value = false;
+
+    result.fold(
+      (failure) {
+        Get.snackbar('Save', failure.message);
+      },
+      (success) async {
+        activeStencil.value = success.data;
+        await fetchRecentActivities();
+        Get.snackbar(
+          'Saved to My Stencils',
+          'Your stencil has been added to My Stencils.',
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      },
+    );
+  }
+
+  Future<void> downloadActiveStencilAsPdf() async {
+    final record = activeStencil.value;
+    final url = record?.stencilImageUrl ?? '';
+    if (url.isEmpty) {
+      Get.snackbar('Download', 'There is no generated stencil to download yet.');
+      return;
+    }
+
+    if (isDownloadingPdf.value) {
+      return;
+    }
+
+    isDownloadingPdf.value = true;
+
+    try {
+      final imageBytes = await _downloadBytes(url);
+      if (imageBytes == null || imageBytes.isEmpty) {
+        throw Exception('Could not download the stencil image.');
+      }
+
+      final pdf = pw.Document();
+      final image = pw.MemoryImage(imageBytes);
+      final styleLabel = record?.style.isNotEmpty == true
+          ? record!.style
+          : 'Tattoo Stencil';
+      final themeLabel = record?.colorTheme.isNotEmpty == true
+          ? record!.colorTheme
+          : 'Printable reference';
+
+      pdf.addPage(
+        pw.Page(
+          pageFormat: PdfPageFormat.a4,
+          margin: const pw.EdgeInsets.all(28),
+          build: (context) {
+            return pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.stretch,
+              children: [
+                pw.Text(
+                  'Cembostyle Stencil',
+                  style: pw.TextStyle(
+                    fontSize: 18,
+                    fontWeight: pw.FontWeight.bold,
+                  ),
+                ),
+                pw.SizedBox(height: 6),
+                pw.Text(
+                  '$styleLabel • $themeLabel',
+                  style: const pw.TextStyle(fontSize: 11),
+                ),
+                pw.SizedBox(height: 18),
+                pw.Expanded(
+                  child: pw.Center(
+                    child: pw.Container(
+                      width: PdfPageFormat.a4.availableWidth,
+                      padding: const pw.EdgeInsets.all(16),
+                      decoration: pw.BoxDecoration(
+                        border: pw.Border.all(color: PdfColors.grey400, width: 1),
+                      ),
+                      child: pw.Image(
+                        image,
+                        fit: pw.BoxFit.contain,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
+      );
+
+      final directory = await _resolvePdfDirectory();
+      await directory.create(recursive: true);
+      final timestamp = DateTime.now().millisecondsSinceEpoch;
+      final file = File('${directory.path}/cembostyle_stencil_$timestamp.pdf');
+      await file.writeAsBytes(await pdf.save(), flush: true);
+
+      Get.snackbar(
+        'Download complete',
+        'Printable A4 PDF saved to ${file.path}',
+        snackPosition: SnackPosition.BOTTOM,
+        duration: const Duration(seconds: 4),
+      );
+    } catch (error) {
+      Get.snackbar('Download', 'Could not create the PDF. $error');
+    } finally {
+      isDownloadingPdf.value = false;
+    }
+  }
+
+  Future<dio.MultipartFile?> _createSourceFile() async {
+    final localFile = selectedImageFile.value;
+    if (localFile != null) {
+      return dio.MultipartFile.fromFile(
+        localFile.path,
+        filename: localFile.path.split('/').last,
+      );
+    }
+
+    final originalUrl = activeStencil.value?.originalImageUrl ?? '';
+    if (originalUrl.isEmpty) {
+      return null;
+    }
+
+    try {
+      final response = await dio.Dio().get<List<int>>(
+        originalUrl,
+        options: dio.Options(responseType: dio.ResponseType.bytes),
+      );
+      final bytes = response.data;
+      if (bytes == null || bytes.isEmpty) {
+        return null;
+      }
+
+      final uri = Uri.tryParse(originalUrl);
+      final lastSegment = uri != null && uri.pathSegments.isNotEmpty
+          ? uri.pathSegments.last
+          : 'stencil-source.jpg';
+      final filename = lastSegment.contains('.')
+          ? lastSegment
+          : '$lastSegment.jpg';
+
+      return dio.MultipartFile.fromBytes(bytes, filename: filename);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<Directory> _resolvePdfDirectory() async {
+    if (Platform.isAndroid) {
+      final downloadDirectories = await getExternalStorageDirectories(
+        type: StorageDirectory.downloads,
+      );
+      if (downloadDirectories != null && downloadDirectories.isNotEmpty) {
+        return Directory('${downloadDirectories.first.path}/Cembostyle');
+      }
+
+      final directory = await getExternalStorageDirectory();
+      if (directory != null) {
+        return Directory('${directory.path}/Cembostyle');
+      }
+    }
+
+    final directory = await getApplicationDocumentsDirectory();
+    return Directory('${directory.path}/Cembostyle');
+  }
+
+  Future<Uint8List?> _downloadBytes(String url) async {
+    try {
+      final response = await dio.Dio().get<List<int>>(
+        url,
+        options: dio.Options(responseType: dio.ResponseType.bytes),
+      );
+      final bytes = response.data;
+      if (bytes == null || bytes.isEmpty) {
+        return null;
+      }
+      return Uint8List.fromList(bytes);
+    } catch (_) {
+      return null;
+    }
   }
 
   int _compareByDateDesc(StencilRecord a, StencilRecord b) {
@@ -247,6 +447,7 @@ class StencilController extends GetxController {
       errorMessage: record.errorMessage,
       colorTheme: record.colorTheme,
       detailLevel: record.detailLevel,
+      isSaved: record.isSaved,
     );
   }
 
@@ -265,7 +466,7 @@ class StencilController extends GetxController {
       selectedColorThemeIndex.value = themeIndex;
     }
 
-    selectedDetailLevel.value = record.detailLevel.clamp(1, 3);
+    selectedDetailLevel.value = record.detailLevel.clamp(0, 2);
     brightness.value = record.brightness.clamp(0.0, 1.0);
     contrast.value = record.contrast.clamp(0.0, 1.0);
   }

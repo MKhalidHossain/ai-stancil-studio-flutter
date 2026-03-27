@@ -9,7 +9,7 @@ void main() {
   ) async {
     await tester.pumpWidget(const GetMaterialApp(home: LetsYouInScreen()));
 
-    expect(find.text('Welcome to Cembostyle'), findsOneWidget);
+    expect(find.text('Welcome to Bheppo Stencil app'), findsOneWidget);
     expect(find.text('Create an Account'), findsOneWidget);
     expect(find.text('Sign in'), findsOneWidget);
   });

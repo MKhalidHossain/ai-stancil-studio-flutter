@@ -144,6 +144,7 @@ class _MyStencilsScreenState extends State<MyStencilsScreen> {
                             stencilImageUrl: item.stencilImageUrl,
                             errorCode: '',
                             errorMessage: item.errorMessage,
+                            isSaved: item.isSaved,
                           ),
                         );
                         Get.toNamed(StencilRoutes.stencilResult);

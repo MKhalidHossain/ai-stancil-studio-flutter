@@ -211,6 +211,7 @@ class StencilEndpoints {
 
   String get create => '$_base/create';
   String get getMyAllStencils => _base;
+  String byId(String id) => '$_base/$id';
 }
 
 class StripeEndpoints {
