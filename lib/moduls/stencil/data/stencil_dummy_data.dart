@@ -5,33 +5,68 @@ class StencilDummyData {
     StencilStyleOption(
       id: 'outline',
       title: 'Outline',
-      subtitle: 'Clean lines',
+      subtitle: 'Simple clean transfer lines',
     ),
     StencilStyleOption(
-      id: 'realism',
+      id: 'realism_map',
       title: 'Realism Map',
-      subtitle: 'Animals',
+      subtitle: 'Grayscale value map for depth and shading',
     ),
     StencilStyleOption(
-      id: 'detail',
+      id: 'detail_guide',
       title: 'Detail Guide',
-      subtitle: 'Optional',
+      subtitle: 'Texture and landmark guide',
     ),
     StencilStyleOption(
-      id: 'halftone',
+      id: 'halftone_guide',
       title: 'Halftone Guide',
-      subtitle: 'Optional advanced',
+      subtitle: 'Dot-shaded guide for print-style shading',
     ),
   ];
 
   static const List<ColorThemeOption> colorThemes = [
-    ColorThemeOption(id: 'black', title: 'Tattoo Black & Grey'),
-    ColorThemeOption(id: 'stencil_violet', title: 'Stencil Violet'),
-    ColorThemeOption(id: 'cobalt', title: 'Stencil Cobalt Blue'),
-    ColorThemeOption(id: 'red_black', title: 'Red & Black Contrast'),
-    ColorThemeOption(id: 'deep_blue', title: 'Deep Blue Ink'),
-    ColorThemeOption(id: 'sepia', title: 'Sepia Draft'),
-    ColorThemeOption(id: 'super', title: 'Super Contrast'),
+    ColorThemeOption(
+      id: 'tattoo_black_grey',
+      title: 'Tattoo Black & Grey',
+      accentColorValue: 0xFF1F1F1F,
+      renderMode: ThemeRenderMode.gemini,
+    ),
+    ColorThemeOption(
+      id: 'stencil_violet',
+      title: 'Stencil Violet',
+      accentColorValue: 0xFF7A4BFF,
+      renderMode: ThemeRenderMode.localTint,
+    ),
+    ColorThemeOption(
+      id: 'stencil_cobalt_blue',
+      title: 'Stencil Cobalt Blue',
+      accentColorValue: 0xFF2859C5,
+      renderMode: ThemeRenderMode.localTint,
+    ),
+    ColorThemeOption(
+      id: 'red_black_contrast',
+      title: 'Red & Black Contrast',
+      accentColorValue: 0xFFB42318,
+      renderMode: ThemeRenderMode.gemini,
+    ),
+    ColorThemeOption(
+      id: 'deep_blue_ink',
+      title: 'Deep Blue Ink',
+      accentColorValue: 0xFF1D4F91,
+      renderMode: ThemeRenderMode.localTint,
+    ),
+    ColorThemeOption(
+      id: 'sepia_draft',
+      title: 'Sepia Draft',
+      accentColorValue: 0xFF8A5A3B,
+      renderMode: ThemeRenderMode.localTint,
+    ),
+    ColorThemeOption(
+      id: 'super_contrast',
+      title: 'Super Contrast',
+      accentColorValue: 0xFF111111,
+      renderMode: ThemeRenderMode.gemini,
+    ),
   ];
 
   static const List<StencilActivityItem> recentActivities = [

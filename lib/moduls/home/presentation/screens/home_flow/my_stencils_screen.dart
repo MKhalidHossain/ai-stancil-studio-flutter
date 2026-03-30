@@ -133,7 +133,9 @@ class _MyStencilsScreenState extends State<MyStencilsScreen> {
                           StencilRecord(
                             id: item.id,
                             style: item.styleName,
+                            styleId: '',
                             colorTheme: item.colorTheme,
+                            colorThemeId: item.colorThemeId,
                             detailLevel: item.detailLevel,
                             brightness: 0.8,
                             contrast: 0.6,
@@ -142,9 +144,13 @@ class _MyStencilsScreenState extends State<MyStencilsScreen> {
                             updatedAt: item.date,
                             originalImageUrl: item.originalImageUrl,
                             stencilImageUrl: item.stencilImageUrl,
+                            baseStencilImageUrl: item.baseStencilImageUrl,
                             errorCode: '',
                             errorMessage: item.errorMessage,
                             isSaved: item.isSaved,
+                            themeRenderMode: item.themeRenderMode,
+                            generationSignature: '',
+                            sourceFingerprint: '',
                           ),
                         );
                         Get.toNamed(StencilRoutes.stencilResult);

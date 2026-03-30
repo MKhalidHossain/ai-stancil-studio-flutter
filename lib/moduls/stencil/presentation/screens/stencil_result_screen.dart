@@ -6,10 +6,10 @@ import 'package:cembostyle/core/common/widgets/app_ui/before_after_slider.dart';
 import 'package:cembostyle/core/common/widgets/app_ui/detail_level_slider.dart';
 import 'package:cembostyle/core/common/widgets/app_ui/home_outline_button.dart';
 import 'package:cembostyle/core/common/widgets/app_ui/home_primary_button.dart';
-import 'package:cembostyle/core/common/widgets/app_ui/styled_dropdown.dart';
 import 'package:cembostyle/core/theme/app_palette.dart';
 import 'package:cembostyle/moduls/stencil/controllers/stencil_controller.dart';
 import 'package:cembostyle/moduls/stencil/presentation/routes/stencil_routes.dart';
+import 'package:cembostyle/moduls/stencil/presentation/widgets/color_theme_selector.dart';
 import 'package:cembostyle/moduls/stencil/presentation/widgets/generating_dialog.dart';
 
 class StencilResultScreen extends StatelessWidget {
@@ -45,9 +45,6 @@ class StencilResultScreen extends StatelessWidget {
           final image = record?.originalImageUrl.isNotEmpty == true
               ? record!.originalImageUrl
               : controller.samples.first.originalUrl;
-          final resultImage = record?.stencilImageUrl.isNotEmpty == true
-              ? record!.stencilImageUrl
-              : controller.samples.first.resultUrl;
           final hasFailed = record?.status == 'FAILED';
 
           return Column(
@@ -68,8 +65,7 @@ class StencilResultScreen extends StatelessWidget {
                       controller.isGenerating.value) {
                     return;
                   }
-                  controller.selectedDetailLevel.value = value;
-                  _regenerateWithLoader(context, controller);
+                  _regenerateWithLoader(context, controller, value);
                 },
               ),
               const SizedBox(height: 18),
@@ -82,31 +78,23 @@ class StencilResultScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 10),
-              StyledDropdown(
-                value: controller.selectedColorTheme,
-                items: controller.colorThemes
-                    .map(
-                      (theme) => DropdownMenuItem(
-                        value: theme,
-                        child: Text(
-                          theme.title,
-                          style: const TextStyle(fontSize: 12),
-                        ),
-                      ),
-                    )
-                    .toList(),
-                onChanged: (newValue) {
-                  if (newValue == null) {
-                    return;
-                  }
+              ColorThemeSelector(
+                themes: controller.colorThemes,
+                selectedThemeId: controller.selectedColorTheme.id,
+                onSelected: (newValue) {
                   final index = controller.colorThemes.indexOf(newValue);
                   if (index < 0 ||
                       index == controller.selectedColorThemeIndex.value ||
                       controller.isGenerating.value) {
                     return;
                   }
-                  controller.selectedColorThemeIndex.value = index;
-                  _regenerateWithLoader(context, controller);
+
+                  if (controller.canApplyThemeInstantly(index)) {
+                    controller.updateSelectedTheme(index);
+                    return;
+                  }
+
+                  _changeThemeWithLoader(context, controller, index);
                 },
               ),
               const SizedBox(height: 14),
@@ -114,7 +102,8 @@ class StencilResultScreen extends StatelessWidget {
                 aspectRatio: 0.94,
                 child: BeforeAfterSlider(
                   beforeImage: image,
-                  afterImage: resultImage,
+                  afterImage: controller.activeGeneratedPreviewUrl,
+                  afterImageColorFilter: controller.activePreviewColorFilter,
                   value: controller.compareValue.value,
                   onChanged: controller.updateCompare,
                 ),
@@ -188,7 +177,7 @@ class StencilResultScreen extends StatelessWidget {
                       height: 46,
                       onTap: controller.isDownloadingPdf.value
                           ? null
-                          : controller.downloadActiveStencilAsPdf,
+                          : () => _showDownloadOptions(context, controller),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -238,20 +227,148 @@ class StencilResultScreen extends StatelessWidget {
 Future<void> _regenerateWithLoader(
   BuildContext context,
   StencilController controller,
+  int value,
 ) async {
   if (controller.isGenerating.value) {
     return;
   }
 
+  final navigator = Navigator.of(context, rootNavigator: true);
   showDialog<void>(
     context: context,
     barrierDismissible: false,
+    useRootNavigator: true,
     builder: (_) => const GeneratingDialog(),
   );
 
-  await controller.generateStencil();
+  await controller.updateSelectedDetailLevel(value);
 
-  if (Get.isDialogOpen ?? false) {
-    Get.back();
+  navigator.pop();
+}
+
+Future<void> _showDownloadOptions(
+  BuildContext context,
+  StencilController controller,
+) async {
+  final format = await showModalBottomSheet<String>(
+    context: context,
+    backgroundColor: Colors.white,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
+    ),
+    builder: (context) {
+      return SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(18, 16, 18, 18),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Download as',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: AppPalette.textPrimary,
+                ),
+              ),
+              const SizedBox(height: 14),
+              _DownloadOptionTile(
+                title: 'JPEG',
+                subtitle: 'Small image file for sharing',
+                onTap: () => Navigator.of(context).pop('jpeg'),
+              ),
+              _DownloadOptionTile(
+                title: 'PNG',
+                subtitle: 'High-quality image with crisp lines',
+                onTap: () => Navigator.of(context).pop('png'),
+              ),
+              _DownloadOptionTile(
+                title: 'PDF',
+                subtitle: 'Printable A4 document',
+                onTap: () => Navigator.of(context).pop('pdf'),
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+  );
+
+  if (format == null || controller.isDownloadingPdf.value) {
+    return;
   }
+
+  await controller.downloadActiveStencil(format);
+}
+
+class _DownloadOptionTile extends StatelessWidget {
+  final String title;
+  final String subtitle;
+  final VoidCallback onTap;
+
+  const _DownloadOptionTile({
+    required this.title,
+    required this.subtitle,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      contentPadding: EdgeInsets.zero,
+      onTap: onTap,
+      leading: Container(
+        width: 40,
+        height: 40,
+        decoration: BoxDecoration(
+          color: AppPalette.purpleSoft,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: const Icon(
+          Icons.download_rounded,
+          color: AppPalette.purple,
+          size: 20,
+        ),
+      ),
+      title: Text(
+        title,
+        style: const TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w700,
+          color: AppPalette.textPrimary,
+        ),
+      ),
+      subtitle: Text(
+        subtitle,
+        style: const TextStyle(
+          fontSize: 12,
+          color: AppPalette.textSecondary,
+        ),
+      ),
+      trailing: const Icon(
+        Icons.arrow_forward_ios_rounded,
+        size: 16,
+        color: AppPalette.textSecondary,
+      ),
+    );
+  }
+}
+
+Future<void> _changeThemeWithLoader(
+  BuildContext context,
+  StencilController controller,
+  int index,
+) async {
+  final navigator = Navigator.of(context, rootNavigator: true);
+  showDialog<void>(
+    context: context,
+    barrierDismissible: false,
+    useRootNavigator: true,
+    builder: (_) => const GeneratingDialog(),
+  );
+
+  await controller.updateSelectedTheme(index);
+
+  navigator.pop();
 }

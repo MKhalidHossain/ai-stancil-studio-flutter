@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import 'package:cembostyle/core/di/service_locator.dart';
+import 'package:cembostyle/core/services/download_notification_service.dart';
 import 'package:cembostyle/moduls/auth/presentation/routes/auth_routes.dart';
 import 'package:cembostyle/moduls/auth/presentation/screens/email_verification_screen.dart';
 import 'package:cembostyle/moduls/auth/presentation/screens/lets_you_in_screen.dart';
@@ -30,6 +31,7 @@ import 'package:cembostyle/moduls/stencil/presentation/screens/stencil_result_sc
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
+  await DownloadNotificationService().initialize();
   setupServiceLocator();
   runApp(const MyApp());
 }

@@ -63,6 +63,7 @@ class CustomizeStyleScreen extends StatelessWidget {
                       child: AppCachedImage(
                         imageFile: localFile,
                         imageUrl: localFile == null ? originalImage : null,
+                        colorFilter: controller.customizePreviewColorFilter,
                         width: double.infinity,
                         height: double.infinity,
                         fit: BoxFit.cover,
@@ -177,17 +178,20 @@ class CustomizeStyleScreen extends StatelessWidget {
                 height: 46,
                 child: ElevatedButton(
                   onPressed: () async {
+                    final navigator = Navigator.of(context, rootNavigator: true);
                     showDialog<void>(
                       context: context,
                       barrierDismissible: false,
+                      useRootNavigator: true,
                       builder: (_) => const GeneratingDialog(),
                     );
 
-                    final success = await controller.generateStencil();
+                    final success = await controller.generateStencil(
+                      useAdjustedSource: true,
+                      forceTattooBlackGrey: true,
+                    );
 
-                    if (Get.isDialogOpen ?? false) {
-                      Get.back();
-                    }
+                    navigator.pop();
 
                     if (success) {
                       Get.toNamed(StencilRoutes.stencilResult);

@@ -1,11 +1,13 @@
 import '../models/home_models.dart';
+import 'package:cembostyle/moduls/stencil/models/stencil_models.dart'
+    show ColorThemeOption, ThemeRenderMode;
 
 class HomeDummyData {
   static const List<CategoryItem> categories = [
     CategoryItem(id: 'outline', title: 'Outline'),
-    CategoryItem(id: 'realism', title: 'Realism Map'),
-    CategoryItem(id: 'detail', title: 'Detail Guide'),
-    CategoryItem(id: 'halftone', title: 'Halftone'),
+    CategoryItem(id: 'realism_map', title: 'Realism Map'),
+    CategoryItem(id: 'detail_guide', title: 'Detail Guide'),
+    CategoryItem(id: 'halftone_guide', title: 'Halftone Guide'),
   ];
 
   static const List<GalleryItem> galleryItems = [
@@ -18,21 +20,21 @@ class HomeDummyData {
     ),
     GalleryItem(
       id: 'g2',
-      categoryId: 'realism',
+      categoryId: 'realism_map',
       title: 'Golden Portrait',
       imageUrl: 'https://picsum.photos/id/1005/600/800',
       resultImageUrl: 'https://picsum.photos/id/1003/600/800',
     ),
     GalleryItem(
       id: 'g3',
-      categoryId: 'detail',
+      categoryId: 'detail_guide',
       title: 'Charcoal Muse',
       imageUrl: 'https://picsum.photos/id/1000/600/800',
       resultImageUrl: 'https://picsum.photos/id/1027/600/800',
     ),
     GalleryItem(
       id: 'g4',
-      categoryId: 'halftone',
+      categoryId: 'halftone_guide',
       title: 'Mountain Path',
       imageUrl: 'https://picsum.photos/id/1018/600/800',
       resultImageUrl: 'https://picsum.photos/id/1016/600/800',
@@ -46,21 +48,21 @@ class HomeDummyData {
     ),
     GalleryItem(
       id: 'g6',
-      categoryId: 'realism',
+      categoryId: 'realism_map',
       title: 'Retro Coupe',
       imageUrl: 'https://picsum.photos/id/1072/600/800',
       resultImageUrl: 'https://picsum.photos/id/1074/600/800',
     ),
     GalleryItem(
       id: 'g7',
-      categoryId: 'detail',
+      categoryId: 'detail_guide',
       title: 'Golden Lion',
       imageUrl: 'https://picsum.photos/id/1070/600/800',
       resultImageUrl: 'https://picsum.photos/id/1069/600/800',
     ),
     GalleryItem(
       id: 'g8',
-      categoryId: 'halftone',
+      categoryId: 'halftone_guide',
       title: 'Regal Portrait',
       imageUrl: 'https://picsum.photos/id/1062/600/800',
       resultImageUrl: 'https://picsum.photos/id/1050/600/800',
@@ -111,12 +113,47 @@ class HomeDummyData {
   ];
 
   static const List<ColorThemeOption> colorThemes = [
-    ColorThemeOption(id: 'black', title: 'Tattoo Black & Grey'),
-    ColorThemeOption(id: 'stencil_violet', title: 'Stencil Violet'),
-    ColorThemeOption(id: 'cobalt', title: 'Stencil Cobalt Blue'),
-    ColorThemeOption(id: 'red_black', title: 'Red & Black Contrast'),
-    ColorThemeOption(id: 'deep_blue', title: 'Deep Blue Ink'),
-    ColorThemeOption(id: 'sepia', title: 'Sepia Draft'),
-    ColorThemeOption(id: 'super', title: 'Super Contrast'),
+    ColorThemeOption(
+      id: 'tattoo_black_grey',
+      title: 'Tattoo Black & Grey',
+      accentColorValue: 0xFF1F1F1F,
+      renderMode: ThemeRenderMode.gemini,
+    ),
+    ColorThemeOption(
+      id: 'stencil_violet',
+      title: 'Stencil Violet',
+      accentColorValue: 0xFF7A4BFF,
+      renderMode: ThemeRenderMode.localTint,
+    ),
+    ColorThemeOption(
+      id: 'stencil_cobalt_blue',
+      title: 'Stencil Cobalt Blue',
+      accentColorValue: 0xFF2859C5,
+      renderMode: ThemeRenderMode.localTint,
+    ),
+    ColorThemeOption(
+      id: 'red_black_contrast',
+      title: 'Red & Black Contrast',
+      accentColorValue: 0xFFB42318,
+      renderMode: ThemeRenderMode.gemini,
+    ),
+    ColorThemeOption(
+      id: 'deep_blue_ink',
+      title: 'Deep Blue Ink',
+      accentColorValue: 0xFF1D4F91,
+      renderMode: ThemeRenderMode.localTint,
+    ),
+    ColorThemeOption(
+      id: 'sepia_draft',
+      title: 'Sepia Draft',
+      accentColorValue: 0xFF8A5A3B,
+      renderMode: ThemeRenderMode.localTint,
+    ),
+    ColorThemeOption(
+      id: 'super_contrast',
+      title: 'Super Contrast',
+      accentColorValue: 0xFF111111,
+      renderMode: ThemeRenderMode.gemini,
+    ),
   ];
 }

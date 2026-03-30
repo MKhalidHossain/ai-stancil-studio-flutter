@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart' as dio;
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -8,7 +9,8 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:cembostyle/core/network/api_client.dart';
 import 'package:cembostyle/core/network/constants/api_constants.dart';
 import 'package:cembostyle/moduls/stencil/models/stencil_models.dart'
-    show StencilRecord;
+    show ColorThemeOption, StencilRecord, ThemeRenderMode;
+import 'package:cembostyle/moduls/stencil/presentation/utils/stencil_tint_filter.dart';
 import '../data/home_dummy_data.dart';
 import '../models/home_models.dart';
 
@@ -47,6 +49,17 @@ class HomeController extends GetxController {
   List<PlanOption> get plans => HomeDummyData.plans;
   List<ColorThemeOption> get colorThemes => HomeDummyData.colorThemes;
   PlanOption get selectedPlan => plans[selectedPlanIndex.value];
+  ColorThemeOption get selectedColorTheme =>
+      colorThemes[selectedColorThemeIndex.value];
+  ColorFilter? get activeGalleryPreviewColorFilter {
+    final preview = activeGalleryPreview.value;
+
+    if (preview == null || preview.themeRenderMode != ThemeRenderMode.localTint) {
+      return null;
+    }
+
+    return buildLocalTintColorFilter(selectedColorTheme);
+  }
 
   Future<void> ensureLoaded() async {
     if (_hasLoadedDashboard) {
@@ -230,7 +243,7 @@ class HomeController extends GetxController {
   }) async {
     galleryPreviewError.value = '';
     final key =
-        '${item.id}::${colorThemes[selectedColorThemeIndex.value].title}::${selectedDetailLevel.value}';
+        '${item.id}::${selectedColorTheme.id}::${selectedDetailLevel.value}';
 
     if (!forceRefresh && _galleryPreviewCache.containsKey(key)) {
       activeGalleryPreview.value = _galleryPreviewCache[key];
@@ -242,19 +255,30 @@ class HomeController extends GetxController {
       itemId: item.id,
       originalImageUrl: item.imageUrl,
       previewImageUrl: '',
+      basePreviewImageUrl: '',
       style: item.categoryId,
-      colorTheme: colorThemes[selectedColorThemeIndex.value].title,
+      styleId: item.categoryId,
+      colorTheme: selectedColorTheme.title,
+      colorThemeId: selectedColorTheme.id,
       detailLevel: selectedDetailLevel.value,
       status: 'PENDING',
       errorMessage: '',
+      themeRenderMode: selectedColorTheme.isLocalTintEligible
+          ? ThemeRenderMode.localTint
+          : ThemeRenderMode.gemini,
     );
 
     final result = await _apiClient.post<GalleryPreview>(
       endpoint: ApiConstants.gallery.previewById(item.id),
       data: {
-        'colorTheme': colorThemes[selectedColorThemeIndex.value].title,
+        'colorTheme': selectedColorTheme.title,
+        'colorThemeId': selectedColorTheme.id,
         'detailLevel': selectedDetailLevel.value,
       },
+      options: dio.Options(
+        sendTimeout: null,
+        receiveTimeout: null,
+      ),
       fromJsonT: (json) =>
           GalleryPreview.fromApi(item.id, json as Map<String, dynamic>),
     );
@@ -265,11 +289,30 @@ class HomeController extends GetxController {
       },
       (success) {
         activeGalleryPreview.value = success.data;
-        _galleryPreviewCache[key] = success.data;
+        _cacheGalleryPreviewVariants(item.id, success.data);
       },
     );
 
     isGalleryPreviewLoading.value = false;
+  }
+
+  void _cacheGalleryPreviewVariants(String itemId, GalleryPreview preview) {
+    final baseKey =
+        '$itemId::${preview.colorThemeId.isNotEmpty ? preview.colorThemeId : selectedColorTheme.id}::${preview.detailLevel}';
+    _galleryPreviewCache[baseKey] = preview;
+
+    if (preview.themeRenderMode != ThemeRenderMode.localTint) {
+      return;
+    }
+
+    for (final theme in colorThemes.where((theme) => theme.isLocalTintEligible)) {
+      final key = '$itemId::${theme.id}::${preview.detailLevel}';
+      _galleryPreviewCache[key] = preview.copyWith(
+        colorTheme: theme.title,
+        colorThemeId: theme.id,
+        themeRenderMode: ThemeRenderMode.localTint,
+      );
+    }
   }
 
   Future<void> refreshRecentActivities() async {

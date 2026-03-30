@@ -4,10 +4,10 @@ import 'package:get/get.dart';
 import 'package:cembostyle/core/common/widgets/app_scaffold.dart';
 import 'package:cembostyle/core/common/widgets/app_ui/before_after_slider.dart';
 import 'package:cembostyle/core/common/widgets/app_ui/detail_level_slider.dart';
-import 'package:cembostyle/core/common/widgets/app_ui/styled_dropdown.dart';
 import 'package:cembostyle/core/theme/app_palette.dart';
 import 'package:cembostyle/moduls/home/controllers/home_controller.dart';
 import 'package:cembostyle/moduls/home/models/home_models.dart';
+import 'package:cembostyle/moduls/stencil/presentation/widgets/color_theme_selector.dart';
 
 class DetailsScreen extends StatefulWidget {
   const DetailsScreen({super.key});
@@ -68,7 +68,6 @@ class _DetailsScreenState extends State<DetailsScreen> {
                     _controller.selectedDetailLevel.value = value;
                     _controller.generateGalleryPreview(
                       item: _item,
-                      forceRefresh: true,
                     );
                   },
                 );
@@ -80,31 +79,19 @@ class _DetailsScreenState extends State<DetailsScreen> {
               ),
               const SizedBox(height: 8),
               Obx(() {
-                final selected =
-                    _controller.colorThemes[_controller.selectedColorThemeIndex.value];
-                return StyledDropdown<ColorThemeOption>(
-                  value: selected,
-                  items: _controller.colorThemes
-                      .map(
-                        (theme) => DropdownMenuItem<ColorThemeOption>(
-                          value: theme,
-                          child: Text(
-                            theme.title,
-                            style: const TextStyle(fontSize: 12),
-                          ),
-                        ),
-                      )
-                      .toList(),
-                  onChanged: (newValue) {
-                    if (newValue == null) {
+                return ColorThemeSelector(
+                  themes: _controller.colorThemes,
+                  selectedThemeId:
+                      _controller.colorThemes[_controller.selectedColorThemeIndex.value].id,
+                  onSelected: (theme) {
+                    final index = _controller.colorThemes.indexOf(theme);
+                    if (index < 0) {
                       return;
                     }
 
-                    final index = _controller.colorThemes.indexOf(newValue);
                     _controller.selectedColorThemeIndex.value = index;
                     _controller.generateGalleryPreview(
                       item: _item,
-                      forceRefresh: true,
                     );
                   },
                 );
@@ -129,6 +116,8 @@ class _DetailsScreenState extends State<DetailsScreen> {
                           BeforeAfterSlider(
                             beforeImage: image,
                             afterImage: resultImage,
+                            afterImageColorFilter:
+                                _controller.activeGalleryPreviewColorFilter,
                             value: _controller.compareValue.value,
                             onChanged: _controller.updateCompare,
                           ),
