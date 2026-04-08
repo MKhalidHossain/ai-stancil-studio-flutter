@@ -10,12 +10,8 @@ import 'package:cembostyle/core/theme/app_palette.dart';
 import 'package:cembostyle/moduls/home/controllers/home_controller.dart';
 import 'package:cembostyle/moduls/home/presentation/routes/home_routes.dart';
 import 'package:cembostyle/moduls/home/presentation/widgets/home_flow/home_hero_card.dart';
-<<<<<<< HEAD
-import '../../../../stencil/presentation/routes/stencil_routes.dart';
-=======
 import 'package:cembostyle/moduls/stencil/controllers/stencil_controller.dart';
 import 'package:cembostyle/moduls/stencil/presentation/routes/stencil_routes.dart';
->>>>>>> ae0368ad5b9acf46fc40907e9cc6056c63594443
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
