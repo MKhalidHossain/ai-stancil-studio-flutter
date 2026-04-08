@@ -17,19 +17,19 @@ class LetsYouInScreen extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 24),
         child: Column(
           children: [
-            const SizedBox(height: 32),
-            const Spacer(),
+            const SizedBox(height: 90),
             Image.asset(AppImages.appLogo, width: 150, height: 130),
             const SizedBox(height: 18),
             Text(
-              'Welcome to Bread Stencil app',
+              'Welcome to Bheppo Stencil app',
               style: GoogleFonts.poppins(
-                fontSize: 15,
-                fontWeight: FontWeight.w500,
+                fontSize: 22,
+                fontWeight: FontWeight.w600,
                 color: AuthColors.textPrimary,
               ),
               textAlign: TextAlign.center,
             ),
+            
             const Spacer(),
             AuthPrimaryButton(
               label: 'Create an Account',

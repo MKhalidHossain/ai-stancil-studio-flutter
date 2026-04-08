@@ -11,16 +11,12 @@ class FormErrorMessage extends StatelessWidget {
   Widget build(BuildContext context) {
     if (message.isEmpty) return const SizedBox.shrink();
 
-    return Container(
-      // margin: const EdgeInsets.symmetric(vertical: 12),
-      // padding: const EdgeInsets.all(12),
-      child: Text(
-        message,
-        style: TextStyle(
-          color: AppColors.red,
-          fontSize: 14,
-          fontWeight: FontWeight.w500,
-        ),
+    return Text(
+      message,
+      style: TextStyle(
+        color: AppColors.red,
+        fontSize: 14,
+        fontWeight: FontWeight.w500,
       ),
     );
   }

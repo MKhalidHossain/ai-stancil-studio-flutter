@@ -39,7 +39,7 @@ class GeneratingDialog extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             const Text(
-              'AI is processing your image this usually takes a few seconds.',
+              'AI is processing your image. We will keep waiting for Gemini until the generation finishes.',
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 12, color: AppPalette.textSecondary),
             ),

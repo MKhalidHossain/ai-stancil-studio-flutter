@@ -125,7 +125,7 @@ class GalleryScreen extends StatelessWidget {
                             vertical: 8,
                           ),
                           decoration: BoxDecoration(
-                            color: AppPalette.purple.withOpacity(0.08),
+                            color: AppPalette.purple.withValues(alpha: 0.08),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Row(

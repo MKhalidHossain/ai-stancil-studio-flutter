@@ -37,10 +37,11 @@ class ApiClient {
   // }
 
   bool _isInitialized = false;
+  late final Future<void> _ready;
 
   ApiClient._internal() {
     if (!_isInitialized) {
-      _initialize();
+      _ready = _initialize();
       _isInitialized = true;
     }
   }
@@ -169,6 +170,7 @@ class ApiClient {
     ProgressCallback? onSendProgress,
     ProgressCallback? onReceiveProgress,
   }) async {
+    await _ready;
     final bool isGet = method.toUpperCase() == 'GET';
     final connectivityCheck = await _checkConnectivity();
     if (connectivityCheck.isLeft()) {

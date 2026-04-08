@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'package:cembostyle/core/common/widgets/app_scaffold.dart';
-import 'package:cembostyle/moduls/home/controllers/home_controller.dart';
 import 'package:cembostyle/core/theme/app_palette.dart';
 import 'package:cembostyle/core/common/widgets/app_ui/home_primary_button.dart';
-import 'package:cembostyle/moduls/home/presentation/widgets/home_flow/stripe_success_dialog.dart';
+import 'package:cembostyle/moduls/home/controllers/home_controller.dart';
 
 class PaymentMethodScreen extends StatefulWidget {
   const PaymentMethodScreen({super.key});
@@ -31,7 +30,7 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
           onPressed: () => Get.back(),
         ),
         title: const Text(
-          'Monthly Plan',
+          'Payment Method',
           style: TextStyle(color: AppPalette.textPrimary, fontSize: 16),
         ),
       ),
@@ -41,15 +40,29 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Try Bheppo stencil app Monthly Plan',
-                style: TextStyle(fontSize: 12, color: AppPalette.textSecondary),
-              ),
-              const SizedBox(height: 6),
-              const Text(
-                r'Then $9.99/mo per week starting 3 March 2026',
-                style: TextStyle(fontSize: 11, color: AppPalette.textSecondary),
-              ),
+              Obx(() {
+                final plan = controller.selectedPlan;
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      plan.checkoutHeadline,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: AppPalette.textSecondary,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      plan.checkoutSummary,
+                      style: const TextStyle(
+                        fontSize: 11,
+                        color: AppPalette.textSecondary,
+                      ),
+                    ),
+                  ],
+                );
+              }),
               const SizedBox(height: 20),
               const Text(
                 'Payment method',
@@ -64,16 +77,28 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
                 ),
                 child: Row(
                   children: [
-                    Radio<int>(
-                      value: 0,
-                      groupValue: selected,
-                      onChanged: (value) =>
-                          setState(() => selected = value ?? 0),
-                      activeColor: AppPalette.purple,
+                    GestureDetector(
+                      onTap: () => setState(() => selected = 0),
+                      child: Container(
+                        width: 20,
+                        height: 20,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(color: AppPalette.purple, width: 1.5),
+                        ),
+                        child: selected == 0
+                            ? const Center(
+                                child: CircleAvatar(
+                                  radius: 5,
+                                  backgroundColor: AppPalette.purple,
+                                ),
+                              )
+                            : null,
+                      ),
                     ),
                     const SizedBox(width: 8),
                     const Text(
-                      'stripe',
+                      'Stripe Checkout',
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
@@ -83,23 +108,48 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
                 ),
               ),
               const SizedBox(height: 16),
+              Obx(
+                () => HomePrimaryButton(
+                  text: controller.isCreatingCheckoutSession.value
+                      ? 'Opening Stripe...'
+                      : 'Continue to Stripe',
+                  icon: const Icon(Icons.auto_awesome, size: 16),
+                  onTap: controller.isCreatingCheckoutSession.value
+                      ? null
+                      : () async {
+                          final opened = await controller.openCheckoutSession();
+                          if (!opened) {
+                            return;
+                          }
+                          if (!mounted) {
+                            return;
+                          }
+                          Get.snackbar(
+                            'Checkout opened',
+                            'After finishing in Stripe, return here and tap "I completed payment".',
+                            snackPosition: SnackPosition.BOTTOM,
+                          );
+                        },
+                ),
+              ),
+              const SizedBox(height: 12),
               HomePrimaryButton(
-                text: 'Pay with Stripe',
-                icon: const Icon(Icons.auto_awesome, size: 16),
+                text: 'I completed payment',
                 onTap: () async {
-                  controller.setActivePlan(true);
-                  showDialog(
-                    context: context,
-                    barrierDismissible: false,
-                    builder: (_) => const StripeSuccessDialog(),
-                  );
-                  await Future.delayed(const Duration(seconds: 2));
-                  if (mounted) {
-                    Get.back();
+                  await controller.syncSubscriptionStatus();
+                  if (controller.hasActivePlan.value && mounted) {
                     Get.back();
                     Get.back();
                   }
                 },
+              ),
+              const SizedBox(height: 12),
+              const Text(
+                'Stripe opens in your browser. Once checkout is complete, return to the app to refresh your premium status.',
+                style: TextStyle(
+                  fontSize: 11,
+                  color: AppPalette.textSecondary,
+                ),
               ),
             ],
           ),

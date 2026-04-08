@@ -1,7 +1,8 @@
-import 'package:cembostyle/moduls/auth/presentation/routes/auth_routes.dart';
 import 'package:cembostyle/moduls/auth/presentation/widgets/auth_widgets.dart';
 import 'package:cembostyle/core/common/constants/app_images.dart';
 import 'package:cembostyle/core/common/widgets/app_scaffold.dart';
+import 'package:cembostyle/moduls/home/controllers/home_controller.dart';
+import 'package:cembostyle/moduls/home/presentation/routes/home_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -55,7 +56,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     );
 
     if (!mounted) return;
-    Get.offAllNamed(AuthRoutes.login);
+    Get.find<HomeController>().setBottomNav(0);
+    Get.offAllNamed(HomeRoutes.home);
   }
 
   @override
@@ -185,79 +187,46 @@ class _PasswordResetSuccessDialogState
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
       insetPadding: const EdgeInsets.symmetric(horizontal: 32),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
+        padding: const EdgeInsets.fromLTRB(22, 18, 22, 18),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Stack(
-              alignment: Alignment.center,
-              children: [
-                Container(
-                  width: 86,
-                  height: 86,
-                  decoration: const BoxDecoration(
-                    color: AuthColors.purple,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.verified_user,
-                    color: Colors.white,
-                    size: 38,
-                  ),
-                ),
-                Positioned(top: -6, right: 6, child: _Dot(size: 8)),
-                Positioned(top: 4, left: -4, child: _Dot(size: 6)),
-                Positioned(bottom: -4, left: 10, child: _Dot(size: 6)),
-                Positioned(bottom: 2, right: -6, child: _Dot(size: 10)),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Successful!',
-              style: GoogleFonts.poppins(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: AuthColors.purple,
-              ),
+            Image.asset(
+              AppImages.success,
+              height: 150,
+              fit: BoxFit.contain,
             ),
             const SizedBox(height: 10),
             Text(
-              'Your account is ready to use. You will be redirected to the Home page in a few seconds.',
+              'Successful!',
+              style: GoogleFonts.poppins(
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+                color: AuthColors.purple,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'Your account is ready to use. Your will\nbe redirected to the Home page in a\nfew seconds..',
               textAlign: TextAlign.center,
               style: GoogleFonts.poppins(
                 fontSize: 12,
-                color: AuthColors.textSecondary,
+                height: 1.45,
+                color: AuthColors.textPrimary,
+                fontWeight: FontWeight.w500,
               ),
             ),
-            const SizedBox(height: 18),
+            const SizedBox(height: 22),
             const SizedBox(
-              width: 20,
-              height: 20,
+              width: 22,
+              height: 22,
               child: CircularProgressIndicator(
-                strokeWidth: 2.4,
+                strokeWidth: 2.2,
                 color: AuthColors.purple,
               ),
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _Dot extends StatelessWidget {
-  final double size;
-
-  const _Dot({required this.size});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: const BoxDecoration(
-        color: AuthColors.purple,
-        shape: BoxShape.circle,
       ),
     );
   }

@@ -1,25 +1,43 @@
+import 'package:flutter/foundation.dart';
+
 class ApiConstants {
-  /// [Base Configuration]
+  static const String _configuredBaseDomain = String.fromEnvironment(
+    'API_BASE_URL',
+    defaultValue: '',
+  );
 
-  static const String baseDomain = 'http://localhost:5000';
-  // static const String baseDomain = 'http://10.10.5.90:5000'; // Farhan Office
+  static String get baseDomain {
+    if (_configuredBaseDomain.isNotEmpty) {
+      return _configuredBaseDomain;
+    }
 
-  // static const String baseDomain = 'http://10.10.5.33:5003'; // Eshita Office
+    if (kIsWeb) {
+      return 'http://127.0.0.1:5000';
+    }
 
-  static const String baseUrl = '$baseDomain/api/v1';
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.android:
+        return 'http://10.0.2.2:5000';
+      case TargetPlatform.iOS:
+      case TargetPlatform.macOS:
+      case TargetPlatform.linux:
+      case TargetPlatform.windows:
+      case TargetPlatform.fuchsia:
+        return 'http://127.0.0.1:5000';
+    }
+  }
 
-  /// Dynamically generated WebSocket URL based on baseDomain
+  static String get baseUrl => '$baseDomain/api/v1';
+
   static String get webSocketUrl {
     if (baseDomain.startsWith('https://')) {
       return baseDomain.replaceFirst('https://', 'wss://');
     } else if (baseDomain.startsWith('http://')) {
       return baseDomain.replaceFirst('http://', 'ws://');
     }
-    // Fallback for unexpected cases (e.g., no scheme)
     return 'ws://$baseDomain';
   }
 
-  /// [Headers]
   static Map<String, String> get defaultHeaders => {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
@@ -32,13 +50,12 @@ class ApiConstants {
 
   static Map<String, String> get multipartHeaders => {
     'Accept': 'application/json',
-    // Content-Type will be set automatically for multipart
   };
 
-  /// [Endpoint Groups
   static AuthEndpoints get auth => AuthEndpoints();
   static SearchEndpoints get search => SearchEndpoints();
   static UserEndpoints get users => UserEndpoints();
+  static AccountEndpoints get account => AccountEndpoints();
   static HistoryEndpoints get history => HistoryEndpoints();
   static MessagesEndpoints get messages => MessagesEndpoints();
   static HomeEndpoints get home => HomeEndpoints();
@@ -51,140 +68,154 @@ class ApiConstants {
   static ProfileEndpoints get profile => ProfileEndpoints();
   static GalleryEndpoints get gallery => GalleryEndpoints();
   static StencilEndpoints get stencil => StencilEndpoints();
+  static StripeEndpoints get stripe => StripeEndpoints();
 }
 
-/// [Authentication Endpoints]
 class AuthEndpoints {
-  static const String _base = '${ApiConstants.baseUrl}/auth';
-  final String refreshToken = '$_base/refresh-token';
+  String get _base => '${ApiConstants.baseUrl}/auth';
 
-  final String login = '$_base/login';
-  final String signup = '$_base/register';
-  final String logout = '$_base/logout';
-  final String forgotPassword = '$_base/forgot-password';
-  final String verifyOtp = '$_base/verify-otp';
-  final String resetPassword = '$_base/reset-password';
-
-  final String google = '$_base/google';
-  final String changePassword = '$_base/change-password';
+  String get refreshToken => '$_base/refresh-token';
+  String get login => '$_base/login';
+  String get signup => '$_base/register';
+  String get logout => '$_base/logout';
+  String get forgotPassword => '$_base/forgot-password';
+  String get verifyOtp => '$_base/verify-otp';
+  String get resetPassword => '$_base/reset-password';
+  String get google => '$_base/google';
+  String get changePassword => '$_base/change-password';
 }
 
 class SearchEndpoints {
-  static const String _base = ApiConstants.baseUrl;
-  final String getAllGigs = '$_base/gigs';
-  String searchGig = '$_base/users/search';
+  String get _base => ApiConstants.baseUrl;
+
+  String get getAllGigs => '$_base/gigs';
+  String get searchGig => '$_base/users/search';
 }
 
 class HistoryEndpoints {
-  static const String _base = ApiConstants.baseUrl;
-  final String getAllOrders = '$_base/orders/my-orders';
-  final String getAllGigs = '$_base/gigs';
+  String get _base => ApiConstants.baseUrl;
+
+  String get getAllOrders => '$_base/orders/my-orders';
+  String get getAllGigs => '$_base/gigs';
 }
 
 class UserEndpoints {
-  static const String _base = '${ApiConstants.baseUrl}/users';
-  final String updateProfile = '$_base/profile';
-  final String uploadWork = '$_base/works';
+  String get _base => '${ApiConstants.baseUrl}/users';
+
+  String get updateProfile => '$_base/profile';
+  String get uploadWork => '$_base/works';
+}
+
+class AccountEndpoints {
+  String get _base => '${ApiConstants.baseUrl}/user';
+
+  String get me => '$_base/me';
+  String get updateProfile => '$_base/update-profile';
 }
 
 class MedicinePlanEndpoints {
-  static const String _base = '${ApiConstants.baseUrl}/medicine-plans';
+  String get _base => '${ApiConstants.baseUrl}/medicine-plans';
 
-  String getFamilyMemberPlans(String memberId) => "$_base/family/$memberId";
+  String getFamilyMemberPlans(String memberId) => '$_base/family/$memberId';
 }
 
 class MessagesEndpoints {
-  static const String _base = '${ApiConstants.baseUrl}/messages';
+  String get _base => '${ApiConstants.baseUrl}/messages';
 
-  final String getListOfChats = "$_base/list";
-  String chatHistoryById(String id) => "$_base/history/$id";
-  final String sendMessage = _base;
+  String get getListOfChats => '$_base/list';
+  String chatHistoryById(String id) => '$_base/history/$id';
+  String get sendMessage => _base;
 }
 
 class HomeEndpoints {
-  static const String _base = '${ApiConstants.baseUrl}/gigs';
-  final String getHome = _base;
+  String get _base => '${ApiConstants.baseUrl}/gigs';
+
+  String get getHome => _base;
 }
 
 class GigsEndpoints {
-  static const String _base = '${ApiConstants.baseUrl}/gigs';
+  String get _base => '${ApiConstants.baseUrl}/gigs';
 
-  final String createGig = _base;
-
-  String getDoctorById(String doctorId) => "$_base/$doctorId";
+  String get createGig => _base;
+  String getDoctorById(String doctorId) => '$_base/$doctorId';
 }
 
 class PortfolioEndpoints {
-  static const String _base = '${ApiConstants.baseUrl}/portfolios';
+  String get _base => '${ApiConstants.baseUrl}/portfolios';
 
-  final String createPortfolio = _base;
+  String get createPortfolio => _base;
 }
 
 class JobPostsEndpoints {
-  static const String _base = '${ApiConstants.baseUrl}/job-posts';
-  final String postJob = _base;
+  String get _base => '${ApiConstants.baseUrl}/job-posts';
+
+  String get postJob => _base;
 }
 
 class OrderEndpoints {
-  static const String _base = '${ApiConstants.baseUrl}/orders';
+  String get _base => '${ApiConstants.baseUrl}/orders';
 
-  final String orderMedicine = _base;
-  final String pharmacyDashboard = "$_base/pharmacy/dashboard";
+  String get orderMedicine => _base;
+  String get pharmacyDashboard => '$_base/pharmacy/dashboard';
 }
 
 class NotificationEndpoints {
-  static const String _base = '${ApiConstants.baseUrl}/notifications';
+  String get _base => '${ApiConstants.baseUrl}/notifications';
 
-  final String getNotification = _base;
+  String get getNotification => _base;
 }
 
 class ProfileEndpoints {
-  static const String _base = '${ApiConstants.baseUrl}/users';
-  final String fetchProfile = '$_base/profile/me';
-  final String updateProfile = '$_base/profile';
-  final String fetchJobs = '${ApiConstants.baseUrl}/job-posts/my/posts';
-  String updateJobs(String jobId) => '${ApiConstants.baseUrl}/job-posts/$jobId';
+  String get _base => '${ApiConstants.baseUrl}/users';
 
-  final String fetchGigs = '${ApiConstants.baseUrl}/gigs/my/gigs';
+  String get fetchProfile => '$_base/profile/me';
+  String get updateProfile => '$_base/profile';
+  String get fetchJobs => '${ApiConstants.baseUrl}/job-posts/my/posts';
+  String updateJobs(String jobId) => '${ApiConstants.baseUrl}/job-posts/$jobId';
+  String get fetchGigs => '${ApiConstants.baseUrl}/gigs/my/gigs';
   String fetchPortfolio(String creativeId) =>
       '${ApiConstants.baseUrl}/portfolios/creative/$creativeId';
-
   String fetchGigById(String gigId) => '${ApiConstants.baseUrl}/gigs/$gigId';
   String fetchPortfolioById(String portfolioId) =>
       '${ApiConstants.baseUrl}/portfolios/$portfolioId';
   String updateGig(String gigId) => '${ApiConstants.baseUrl}/gigs/$gigId';
   String updatePortfolio(String portfolioId) =>
       '${ApiConstants.baseUrl}/portfolios/$portfolioId';
-
-  final String fetchLikes = '${ApiConstants.baseUrl}/social/my-likes';
-  final String createBlock = '${ApiConstants.baseUrl}/social/block';
-  final String fetchBlock = '${ApiConstants.baseUrl}/social/blocked-users';
-  final String fetchPublicJobs = '${ApiConstants.baseUrl}/job-posts';
+  String get fetchLikes => '${ApiConstants.baseUrl}/social/my-likes';
+  String get createBlock => '${ApiConstants.baseUrl}/social/block';
+  String get fetchBlock => '${ApiConstants.baseUrl}/social/blocked-users';
+  String get fetchPublicJobs => '${ApiConstants.baseUrl}/job-posts';
   String fetchPublicClientProfile(String userId) =>
       '${ApiConstants.baseUrl}/users/client/$userId';
-
-  final String createGigs = '${ApiConstants.baseUrl}/gigs';
-  final String changePass = '${ApiConstants.baseUrl}/auth/change-password';
-  final String toggleLikes = '${ApiConstants.baseUrl}/social/like';
-
+  String get createGigs => '${ApiConstants.baseUrl}/gigs';
+  String get changePass => '${ApiConstants.baseUrl}/auth/change-password';
+  String get toggleLikes => '${ApiConstants.baseUrl}/social/like';
   String fetchPublicCreativeProfile(String userId) =>
       '${ApiConstants.baseUrl}/users/creative/$userId';
   String unblockUser(String userId) =>
       '${ApiConstants.baseUrl}/social/block/$userId';
-
-  final String fetchDislikes = '${ApiConstants.baseUrl}/social/my-dislikes';
-  final String toggleDislikes = '${ApiConstants.baseUrl}/social/dislike';
+  String get fetchDislikes => '${ApiConstants.baseUrl}/social/my-dislikes';
+  String get toggleDislikes => '${ApiConstants.baseUrl}/social/dislike';
 }
 
 class GalleryEndpoints {
-  static const String _base = '${ApiConstants.baseUrl}/pregallery';
+  String get _base => '${ApiConstants.baseUrl}/pregallery';
 
-  String byCategory(String category) =>
-      '$_base/${Uri.encodeComponent(category)}';
+  String get getAll => '$_base/get-all-gallery-items';
+  String byCategory(String category) => '$_base/${Uri.encodeComponent(category)}';
+  String previewById(String id) => '$_base/$id/preview';
 }
 
 class StencilEndpoints {
-  static const String _base = '${ApiConstants.baseUrl}/aistencil';
+  String get _base => '${ApiConstants.baseUrl}/aistencil';
 
-  final String getMyAllStencils = _base;
+  String get create => '$_base/create';
+  String get getMyAllStencils => _base;
+  String byId(String id) => '$_base/$id';
+}
+
+class StripeEndpoints {
+  String get _base => '${ApiConstants.baseUrl}/stripe';
+
+  String get createPaymentSession => '$_base/create-payment-session';
 }

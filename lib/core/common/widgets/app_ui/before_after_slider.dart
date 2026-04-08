@@ -6,6 +6,7 @@ import 'package:cembostyle/core/theme/app_palette.dart';
 class BeforeAfterSlider extends StatelessWidget {
   final String beforeImage;
   final String afterImage;
+  final ColorFilter? afterImageColorFilter;
   final double value;
   final ValueChanged<double> onChanged;
 
@@ -13,6 +14,7 @@ class BeforeAfterSlider extends StatelessWidget {
     super.key,
     required this.beforeImage,
     required this.afterImage,
+    this.afterImageColorFilter,
     required this.value,
     required this.onChanged,
   });
@@ -45,6 +47,7 @@ class BeforeAfterSlider extends StatelessWidget {
             children: [
               AppCachedImage(
                 imageUrl: afterImage,
+                colorFilter: afterImageColorFilter,
                 width: width,
                 height: height,
                 borderRadius: BorderRadius.circular(radius),

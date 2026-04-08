@@ -6,6 +6,7 @@ import '../shimmer/shimmer_loader.dart';
 class AppCachedImage extends StatelessWidget {
   final String? imageUrl; // network image
   final File? imageFile;  // local image (picked)
+  final ColorFilter? colorFilter;
   final double? width;
   final double? height;
   final BoxFit fit;
@@ -18,6 +19,7 @@ class AppCachedImage extends StatelessWidget {
     super.key,
     this.imageUrl,
     this.imageFile,
+    this.colorFilter,
     this.width,
     this.height,
     this.fit = BoxFit.cover,
@@ -36,15 +38,28 @@ class AppCachedImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Widget applyFilter(Widget child) {
+      if (colorFilter == null) {
+        return child;
+      }
+
+      return ColorFiltered(
+        colorFilter: colorFilter!,
+        child: child,
+      );
+    }
+
     // 1️⃣ If local image is provided, show it directly
     if (imageFile != null) {
       return ClipRRect(
         borderRadius: borderRadius ?? BorderRadius.zero,
-        child: Image.file(
-          imageFile!,
-          width: width,
-          height: height,
-          fit: fit,
+        child: applyFilter(
+          Image.file(
+            imageFile!,
+            width: width,
+            height: height,
+            fit: fit,
+          ),
         ),
       );
     }
@@ -91,6 +106,14 @@ class AppCachedImage extends StatelessWidget {
         width: width,
         height: height,
         fit: fit,
+        imageBuilder: (context, imageProvider) => applyFilter(
+          Image(
+            image: imageProvider,
+            width: width,
+            height: height,
+            fit: fit,
+          ),
+        ),
         placeholder: (context, url) => ShimmerLoader(
           isLoading: true,
           child: Container(

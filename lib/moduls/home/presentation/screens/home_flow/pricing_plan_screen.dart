@@ -178,7 +178,7 @@ class PricingPlanScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 12),
                       Text(
-                        'Your subscription begins after 3 days. Cancel anytime before trial ends, no charges. After trial: \$9.99/month',
+                        plan.checkoutSummary,
                         textAlign: TextAlign.center,
                         style: const TextStyle(
                           fontSize: 10,
@@ -203,9 +203,9 @@ class PricingPlanScreen extends StatelessWidget {
                 title: 'Refund Policy',
                 highlight: true,
                 lines: [
-                  'Refunds are processed by Bheppo LLC through Stripe',
+                  'Refunds are processed by Cembostyle through Stripe',
                   'Cancel during the trial period - no charges applied',
-                  'Contact support@bheppo.com for refund requests',
+                  'Contact support for refund requests',
                 ],
               ),
               const SizedBox(height: 12),
@@ -213,7 +213,7 @@ class PricingPlanScreen extends StatelessWidget {
                 title: 'Secure Payment',
                 lines: [
                   'Payments are processed securely through Stripe, Inc.',
-                  'Bheppo LLC does not store full credit card information.',
+                  'Cembostyle does not store full card information.',
                 ],
                 footer: 'Secure Payments',
               ),
@@ -226,7 +226,7 @@ class PricingPlanScreen extends StatelessWidget {
               const SizedBox(height: 6),
               const Center(
                 child: Text(
-                  'Bheppo LLC © 2026',
+                  'Cembostyle © 2026',
                   style: TextStyle(
                     fontSize: 10,
                     color: AppPalette.textSecondary,
